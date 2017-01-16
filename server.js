@@ -13,38 +13,84 @@ var app = express();
 // El contenido de la carpeta public se muestra en la raíz del servidor
 app.use(express.static(__dirname + "/public"));
 
-/*
-    GET /plazo/:fecha
+var bilbaoM = ["06:35", "07:00", "07:15", "07:30", "08:00", "08:30", "08:45", "09:00", "09:15", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:15", "13:45", "14:00", "14:30"];
+var bilbaoT = ["14:50", "15:10", "15:30", "15:45", "16:00", "16:30", "17:00", "17:30", "18:00", "18:15", "18:40", "19:00", "19:20", "19:45", "20:15", "20:30", "20:45", "21:30", "22:15"];
+var donostiM = ["00:30", "07:30", "08:30", "08:45", "09:00", "10:00", "12:00", "13:00"];
+var donostiT = ["14:00", "15:15", "16:00", "18:30", "20:30"];
+var pamplonaM = ["07:00", "09:00", "10:00", "11:30", "13:00"];
+var pamplonaT = ["15:00", "15:30", "17:00", "18:00", "19:00", "20:30", "21:00"];
 
-    Ruta que calcula el número de días que faltan para una fecha
+var ahora = new Date();  
+var horas=ahora.getHours()+1; //Le añadimos 1 para que sea el horario de aquí
+var minutos=ahora.getMinutes();
+var hora=horas+":"+minutos;
+function mostrarH(horarios) {
+	respu = "Tienes "+horarios.length+" buses a la mañana";
+	for (i in horarios) {
+		respu+="\n"+horarios[i]; 
+	}
+	var salir = false;
+	var cuenta=0;
+	var r = "";
+	while (salir==false) {
+		var ho=horarios[cuenta].split(":");
+		if (ho[0]>=horas){
+			if (ho[0]==horas){
+				if (minutos<ho[1]){
+					var tiempo_esp = parseInt(ho[1])+minutos;
+					r = "\nSon las "+hora+", te faltan "+tiempo_esp+" minutos para el siguiente bus 1";
+					salir=true;
+				}
+			}else{
+				var tiempo_esp = 60-minutos+parseInt(ho[1])+(60*(ho[0]-horas-1));
+				r = "\nSon las "+hora+", te faltan "+tiempo_esp+" minutos para el siguiente bus 2";
+				salir=true;
+			}	
+		}else{
+			r="\nNo tienes buses hoy";
+		}
+		if (cuenta >= horarios.length-1){
+			salir=true;
+		}
+		cuenta++;
+	}
+	respu+=r;
+	return respu;
+}
 
-    Si el servidor se está ejecutando localmente:
-
-    http://localhost:3000/plazo/2017-01-31T23:59:59.000Z
-
-    Devuelve un objeto JSON con el formato:
-
-    [{"text":"Faltan 59 días..."}]
-*/
-app.get("/plazo/:fecha", function (req, res) {
+app.get("/buses/:lugar/:parte", function (req, res) {
 
     // Obtener la fecha que llega en la URL
-    var fecha_entrega = new Date(req.params.fecha);
-    var ahora = new Date();
-
-    // Algo no ha ido bien
-    if (!fecha_entrega) {
-        return res.status(400).send();
-    }
-
-    // http://stackoverflow.com/questions/2627473/how-to-calculate-the-number-of-days-between-two-dates-using-javascript
-    var oneDay = 24 * 60 * 60 * 1000;
-    var dias = Math.round(Math.abs((ahora.getTime() - fecha_entrega.getTime()) / (oneDay)));
-
+    var lugar = req.params.lugar;
+    var parte = req.params.parte;
+	var resp = "";
+	switch (lugar) {
+		case "bilbao":
+			if (parte == "manana"){
+				resp = mostrarH(bilbaoM);
+			}else if (parte == "tarde"){
+				resp = mostrarH(bilbaoT);
+			}
+			break;
+		case "donosti":
+			if (parte == "manana"){
+				resp = mostrarH(donostiM);
+			}else if (parte == "tarde"){
+				resp = mostrarH(donostiT);
+			}
+			break;
+		case "pamplona":
+			if (parte == "manana"){
+				resp = mostrarH(pamplonaM);
+			}else if (parte == "tarde"){
+				resp = mostrarH(pamplonaT);
+			}
+			break;
+	}
     // Crear el objeto con la respuesta
     var respuesta = [
         {
-            text: "Faltan " + dias + " días...",
+            text: resp,
         }
     ];
 
