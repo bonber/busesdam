@@ -43,4 +43,10 @@ Pasos a seguir:
 
 	```bash
 	git push heroku
-	```		
+	```			
+4. Guardar cambios y publicarlos:	
+
+	```bash
+	git commit -am "Cambios"
+	git push heroku master
+	```	
