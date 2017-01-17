@@ -38,12 +38,12 @@ function mostrarH(horarios) {
 			if (ho[0]==horas){
 				if (minutos<ho[1]){
 					var tiempo_esp = parseInt(ho[1])+minutos;
-					r = "\nSon las "+hora+", te faltan "+tiempo_esp+" minutos para el siguiente bus 1";
+					r = "\nSon las "+hora+", te faltan "+tiempo_esp+" minutos para el siguiente bus";
 					salir=true;
 				}
 			}else{
 				var tiempo_esp = 60-minutos+parseInt(ho[1])+(60*(ho[0]-horas-1));
-				r = "\nSon las "+hora+", te faltan "+tiempo_esp+" minutos para el siguiente bus 2";
+				r = "\nSon las "+hora+", te faltan "+tiempo_esp+" minutos para el siguiente bus";
 				salir=true;
 			}	
 		}else{
